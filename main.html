@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>밀리 엔터프라이즈 - 관리자 대시보드</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+      .sidebar-active {
+        background-color: #eef2f7;
+        color: #003366;
+        font-weight: bold;
+        border-radius: 0.375rem;
+      }
+      .sidebar-item:hover {
+        background-color: #f5f8fa;
+        border-radius: 0.375rem;
+      }
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      }
+      .content-transition {
+        transition: all 0.3s ease;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 font-sans">
+    <!-- 상단 네비게이션 바 -->
+    <nav class="bg-indigo-900 text-white px-6 py-4 shadow-md fixed w-full z-10">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <span class="font-bold text-xl">밀리 엔터프라이즈</span>
+          <div class="hidden md:flex space-x-6 ml-10">
+            <a
+              href="#"
+              class="hover:text-blue-200 transition px-2 py-1 border-b-2 border-white"
+              >대시보드</a
+            >
+            <a href="#" class="hover:text-blue-200 transition px-2 py-1"
+              >콘텐츠 관리</a
+            >
+            <a href="#" class="hover:text-blue-200 transition px-2 py-1"
+              >구성원 관리</a
+            >
+            <a href="#" class="hover:text-blue-200 transition px-2 py-1"
+              >데이터 분석</a
+            >
+            <a href="#" class="hover:text-blue-200 transition px-2 py-1"
+              >설정</a
+            >
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <button
+              id="notification-btn"
+              class="p-1 rounded-full hover:bg-indigo-800"
+            >
+              <i class="fas fa-bell"></i>
+              <span
+                class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"
+              ></span>
+            </button>
+          </div>
+          <div class="relative">
+            <button
+              id="profile-btn"
+              class="flex items-center space-x-2 focus:outline-none"
+            >
+              <img
+                src="/api/placeholder/32/32"
+                class="h-8 w-8 rounded-full"
+                alt="profile"
+              />
+              <span class="hidden md:block">홍길동</span>
+              <i class="fas fa-chevron-down text-xs"></i>
+            </button>
+            <div
+              id="profile-dropdown"
+              class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
+            >
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >프로필</a
+              >
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >설정</a
+              >
+              <div class="border-t border-gray-100"></div>
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >로그아웃</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 메인 컨테이너 -->
+    <div class="flex pt-16">
+      <!-- 왼쪽 사이드바 -->
+      <aside class="w-64 bg-white shadow-md fixed h-full pt-6 hidden md:block">
+        <div class="px-4">
+          <div class="mb-6">
+            <p class="text-xs uppercase text-gray-500 mb-4 tracking-wider">
+              메인 메뉴
+            </p>
+            <div class="space-y-2">
+              <a
+                href="#"
+                class="sidebar-item sidebar-active flex items-center px-4 py-3 text-sm"
+              >
+                <i class="fas fa-chart-line mr-3"></i>
+                <span>종합 대시보드</span>
+              </a>
+              <a
+                href="#"
+                class="sidebar-item flex items-center px-4 py-3 text-sm text-gray-600"
+              >
+                <i class="fas fa-building mr-3"></i>
+                <span>부서별 현황</span>
+              </a>
+              <a
+                href="#"
+                class="sidebar-item flex items-center px-4 py-3 text-sm text-gray-600"
+              >
+                <i class="fas fa-brain mr-3"></i>
+                <span>역량별 분석</span>
+              </a>
+              <a
+                href="#"
+                class="sidebar-item flex items-center px-4 py-3 text-sm text-gray-600"
+              >
+                <i class="fas fa-book mr-3"></i>
+                <span>콘텐츠 인기도</span>
+              </a>
+              <a
+                href="#"
+                class="sidebar-item flex items-center px-4 py-3 text-sm text-gray-600"
+              >
+                <i class="fas fa-chart-bar mr-3"></i>
+                <span>독서 활동 추이</span>
+              </a>
+            </div>
+          </div>
+          <div class="mb-6">
+            <p class="text-xs uppercase text-gray-500 mb-4 tracking-wider">
+              관리
+            </p>
+            <div class="space-y-2">
+              <a
+                href="#"
+                class="sidebar-item flex items-center px-4 py-3 text-sm text-gray-600"
+              >
+                <i class="fas fa-users mr-3"></i>
+                <span>구성원 관리</span>
+              </a>
+              <a
+                href="#"
+                class="sidebar-item flex items-center px-4 py-3 text-sm text-gray-600"
+              >
+                <i class="fas fa-book-open mr-3"></i>
+                <span>도서 관리</span>
+              </a>
+              <a
+                href="#"
+                class="sidebar-item flex items-center px-4 py-3 text-sm text-gray-600"
+              >
+                <i class="fas fa-clipboard-list mr-3"></i>
+                <span>리포트 생성</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 모바일 사이드 메뉴 토글 -->
+      <div class="fixed left-0 bottom-4 md:hidden z-30">
+        <button
+          id="mobile-menu-toggle"
+          class="bg-indigo-900 text-white p-3 rounded-r-lg shadow-lg"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+
+      <!-- 메인 콘텐츠 -->
+      <main
+        class="flex-1 ml-0 md:ml-64 p-6 content-transition min-h-screen"
+        id="main-content"
+      >
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-gray-800">대시보드</h1>
+          <p class="text-gray-600">
+            현재 조직의 독서 활동 및 역량 개발 현황을 확인하세요.
+          </p>
+        </div>
+
+        <!-- 날짜 필터 -->
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <select
+              id="date-filter"
+              class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="today">오늘</option>
+              <option value="week">이번 주</option>
+              <option value="month" selected>이번 달</option>
+              <option value="quarter">이번 분기</option>
+              <option value="year">올해</option>
+            </select>
+          </div>
+          <div>
+            <button
+              class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm hover:bg-gray-50"
+            >
+              <i class="fas fa-download mr-1"></i> 리포트 다운로드
+            </button>
+          </div>
+        </div>
+
+        <!-- 통계 카드 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <div
+            class="bg-white rounded-lg shadow-md p-5 stat-card transition-all duration-300"
+          >
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-500 text-sm">활성 사용자</p>
+                <h3 class="text-2xl font-bold text-indigo-900 mt-2">1,245명</h3>
+                <p class="text-green-500 text-sm mt-1">
+                  <i class="fas fa-arrow-up mr-1"></i> 12% 증가
+                </p>
+              </div>
+              <div class="bg-indigo-100 p-3 rounded-full">
+                <i class="fas fa-users text-indigo-800"></i>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-white rounded-lg shadow-md p-5 stat-card transition-all duration-300"
+          >
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-500 text-sm">월간 평균 독서량</p>
+                <h3 class="text-2xl font-bold text-indigo-900 mt-2">3.2권</h3>
+                <p class="text-green-500 text-sm mt-1">
+                  <i class="fas fa-arrow-up mr-1"></i> 8% 증가
+                </p>
+              </div>
+              <div class="bg-blue-100 p-3 rounded-full">
+                <i class="fas fa-book-open text-blue-800"></i>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-white rounded-lg shadow-md p-5 stat-card transition-all duration-300"
+          >
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-500 text-sm">참여율</p>
+                <h3 class="text-2xl font-bold text-indigo-900 mt-2">78.5%</h3>
+                <p class="text-green-500 text-sm mt-1">
+                  <i class="fas fa-arrow-up mr-1"></i> 5% 증가
+                </p>
+              </div>
+              <div class="bg-green-100 p-3 rounded-full">
+                <i class="fas fa-chart-line text-green-800"></i>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-white rounded-lg shadow-md p-5 stat-card transition-all duration-300"
+          >
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-500 text-sm">평균 완독 시간</p>
+                <h3 class="text-2xl font-bold text-indigo-900 mt-2">12일</h3>
+                <p class="text-red-500 text-sm mt-1">
+                  <i class="fas fa-arrow-down mr-1"></i> 3% 감소
+                </p>
+              </div>
+              <div class="bg-purple-100 p-3 rounded-full">
+                <i class="fas fa-clock text-purple-800"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 차트 및 테이블 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <!-- 부서별 독서 활동 -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-gray-800">부서별 독서 활동</h3>
+              <div>
+                <select
+                  id="chart-type"
+                  class="bg-white border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none"
+                >
+                  <option value="participation">참여율</option>
+                  <option value="completed">완독 수</option>
+                  <option value="time">독서 시간</option>
+                </select>
+              </div>
+            </div>
+            <div class="h-80">
+              <canvas id="departmentChart"></canvas>
+            </div>
+          </div>
+
+          <!-- 인기 콘텐츠 -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-gray-800">인기 콘텐츠 TOP 10</h3>
+              <button class="text-indigo-600 hover:text-indigo-800 text-sm">
+                전체보기
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="border-b">
+                    <th class="pb-3 text-sm font-medium text-gray-500">순위</th>
+                    <th class="pb-3 text-sm font-medium text-gray-500">
+                      도서명
+                    </th>
+                    <th class="pb-3 text-sm font-medium text-gray-500">
+                      카테고리
+                    </th>
+                    <th class="pb-3 text-sm font-medium text-gray-500">
+                      독자 수
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 text-sm">1</td>
+                    <td class="py-3 text-sm font-medium">
+                      디지털 트랜스포메이션 전략
+                    </td>
+                    <td class="py-3 text-sm">경영/전략</td>
+                    <td class="py-3 text-sm">324명</td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 text-sm">2</td>
+                    <td class="py-3 text-sm font-medium">애자일 조직 만들기</td>
+                    <td class="py-3 text-sm">조직/리더십</td>
+                    <td class="py-3 text-sm">287명</td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 text-sm">3</td>
+                    <td class="py-3 text-sm font-medium">
+                      미래 모빌리티 트렌드
+                    </td>
+                    <td class="py-3 text-sm">기술/트렌드</td>
+                    <td class="py-3 text-sm">256명</td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 text-sm">4</td>
+                    <td class="py-3 text-sm font-medium">
+                      데이터 기반 의사결정
+                    </td>
+                    <td class="py-3 text-sm">데이터/분석</td>
+                    <td class="py-3 text-sm">212명</td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 text-sm">5</td>
+                    <td class="py-3 text-sm font-medium">리더의 회복탄력성</td>
+                    <td class="py-3 text-sm">리더십/자기계발</td>
+                    <td class="py-3 text-sm">198명</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 역량 개발 현황 & 독서 트렌드 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <!-- 역량 개발 현황 -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-gray-800">역량 개발 현황</h3>
+              <button class="text-indigo-600 hover:text-indigo-800 text-sm">
+                상세보기
+              </button>
+            </div>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>리더십</span>
+                  <span class="font-medium">76%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    class="bg-indigo-600 h-2 rounded-full"
+                    style="width: 76%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>기술/엔지니어링</span>
+                  <span class="font-medium">82%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    class="bg-blue-500 h-2 rounded-full"
+                    style="width: 82%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>마케팅/영업</span>
+                  <span class="font-medium">65%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    class="bg-green-500 h-2 rounded-full"
+                    style="width: 65%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>디자인/UX</span>
+                  <span class="font-medium">70%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    class="bg-purple-500 h-2 rounded-full"
+                    style="width: 70%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>데이터 분석</span>
+                  <span class="font-medium">58%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    class="bg-yellow-500 h-2 rounded-full"
+                    style="width: 58%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 월별 독서 트렌드 -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-gray-800">월별 독서 트렌드</h3>
+              <div>
+                <select
+                  id="trend-type"
+                  class="bg-white border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none"
+                >
+                  <option value="all">전체</option>
+                  <option value="completed">완독</option>
+                  <option value="started">시작</option>
+                </select>
+              </div>
+            </div>
+            <div class="h-64">
+              <canvas id="trendChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- 최근 활동 & 공지사항 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- 최근 활동 -->
+          <div class="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-gray-800">최근 활동</h3>
+              <button class="text-indigo-600 hover:text-indigo-800 text-sm">
+                모두 보기
+              </button>
+            </div>
+            <div class="space-y-4">
+              <div class="flex items-start space-x-4">
+                <img
+                  src="/api/placeholder/40/40"
+                  class="h-10 w-10 rounded-full"
+                  alt="User"
+                />
+                <div>
+                  <p class="text-sm">
+                    <span class="font-medium">김철수</span>(UX팀)님이
+                    <span class="font-medium">디자인 씽킹 바이블</span>을
+                    완독했습니다.
+                  </p>
+                  <p class="text-xs text-gray-500 mt-1">2시간 전</p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-4">
+                <img
+                  src="/api/placeholder/40/40"
+                  class="h-10 w-10 rounded-full"
+                  alt="User"
+                />
+                <div>
+                  <p class="text-sm">
+                    <span class="font-medium">이영희</span>(마케팅팀)님이
+                    <span class="font-medium">브랜드 전략의 모든 것</span>에
+                    대한 메모를 공유했습니다.
+                  </p>
+                  <p class="text-xs text-gray-500 mt-1">4시간 전</p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-4">
+                <img
+                  src="/api/placeholder/40/40"
+                  class="h-10 w-10 rounded-full"
+                  alt="User"
+                />
+                <div>
+                  <p class="text-sm">
+                    <span class="font-medium">박민수</span>(개발팀)님이
+                    <span class="font-medium">클린 코드</span> 독서를
+                    시작했습니다.
+                  </p>
+                  <p class="text-xs text-gray-500 mt-1">5시간 전</p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-4">
+                <img
+                  src="/api/placeholder/40/40"
+                  class="h-10 w-10 rounded-full"
+                  alt="User"
+                />
+                <div>
+                  <p class="text-sm">
+                    <span class="font-medium">정지영</span>(인사팀)님이
+                    <span class="font-medium">조직문화 혁신 리더십</span>에 대한
+                    북클럽을 개설했습니다.
+                  </p>
+                  <p class="text-xs text-gray-500 mt-1">어제</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 공지사항 -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-gray-800">공지사항</h3>
+              <button class="text-indigo-600 hover:text-indigo-800 text-sm">
+                더보기
+              </button>
+            </div>
+            <div class="space-y-3">
+              <div class="border-l-4 border-indigo-500 pl-3 py-1">
+                <p class="text-sm font-medium">4월 독서 챌린지 안내</p>
+                <p class="text-xs text-gray-500 mt-1">2025.04.01</p>
+              </div>
+              <div class="border-l-4 border-indigo-500 pl-3 py-1">
+                <p class="text-sm font-medium">신규 콘텐츠 업데이트 안내</p>
+                <p class="text-xs text-gray-500 mt-1">2025.03.25</p>
+              </div>
+              <div class="border-l-4 border-gray-300 pl-3 py-1">
+                <p class="text-sm font-medium">3월 우수 독자 발표</p>
+                <p class="text-xs text-gray-500 mt-1">2025.03.15</p>
+              </div>
+              <div class="border-l-4 border-gray-300 pl-3 py-1">
+                <p class="text-sm font-medium">
+                  밀리 엔터프라이즈 2.0 업데이트
+                </p>
+                <p class="text-xs text-gray-500 mt-1">2025.03.01</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // 프로필 드롭다운 토글
+      document
+        .getElementById("profile-btn")
+        .addEventListener("click", function () {
+          document
+            .getElementById("profile-dropdown")
+            .classList.toggle("hidden");
+        });
+
+      // 모바일 메뉴 토글
+      document
+        .getElementById("mobile-menu-toggle")
+        .addEventListener("click", function () {
+          const aside = document.querySelector("aside");
+          const mainContent = document.getElementById("main-content");
+
+          aside.classList.toggle("hidden");
+
+          if (!aside.classList.contains("hidden")) {
+            aside.classList.add("fixed", "z-20", "top-16", "left-0", "w-64");
+            mainContent.classList.add("opacity-50");
+          } else {
+            mainContent.classList.remove("opacity-50");
+          }
+        });
+
+      // 바깥 영역 클릭 시 드롭다운 닫기
+      document.addEventListener("click", function (event) {
+        const profileDropdown = document.getElementById("profile-dropdown");
+        const profileBtn = document.getElementById("profile-btn");
+
+        if (
+          !profileBtn.contains(event.target) &&
+          !profileDropdown.contains(event.target)
+        ) {
+          profileDropdown.classList.add("hidden");
+        }
+      });
+
+      // 부서별 독서 활동 차트
+      const departmentCtx = document
+        .getElementById("departmentChart")
+        .getContext("2d");
+      const departmentChart = new Chart(departmentCtx, {
+        type: "bar",
+        data: {
+          labels: ["R&D", "마케팅", "인사", "재무", "영업", "디자인", "IT"],
+          datasets: [
+            {
+              label: "참여율(%)",
+              data: [82, 65, 75, 48, 60, 72, 68],
+              backgroundColor: [
+                "rgba(78, 115, 223, 0.8)",
+                "rgba(28, 200, 138, 0.8)",
+                "rgba(54, 185, 204, 0.8)",
+                "rgba(246, 194, 62, 0.8)",
+                "rgba(231, 74, 59, 0.8)",
+                "rgba(153, 102, 255, 0.8)",
+                "rgba(201, 203, 207, 0.8)",
+              ],
+              borderWidth: 0,
+              borderRadius: 4,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                callback: function (value) {
+                  return value + "%";
+                },
+              },
+            },
+          },
+        },
+      });
+
+      // 월별 독서 트렌드 차트
+      const trendCtx = document.getElementById("trendChart").getContext("2d");
+      const trendChart = new Chart(trendCtx, {
+        type: "line",
+        data: {
+          labels: ["11월", "12월", "1월", "2월", "3월", "4월"],
+          datasets: [
+            {
+              label: "독서량",
+              data: [985, 1150, 1250, 1380, 1500, 1245],
+              borderColor: "rgba(78, 115, 223, 1)",
+              backgroundColor: "rgba(78, 115, 223, 0.1)",
+              tension: 0.4,
+              fill: true,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false,
+            },
+            tooltip: {
+              mode: "index",
+              intersect: false,
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0,
+              },
+            },
+          },
+        },
+      });
+
+      // 차트 타입 변경 이벤트
+      document
+        .getElementById("chart-type")
+        .addEventListener("change", function (e) {
+          const chartType = e.target.value;
+          let newData, newLabel;
+
+          switch (chartType) {
+            case "participation":
+              newData = [82, 65, 75, 48, 60, 72, 68];
+              newLabel = "참여율(%)";
+              break;
+            case "completed":
+              newData = [324, 187, 243, 112, 156, 198, 245];
+              newLabel = "완독 수";
+              break;
+            case "time":
+              newData = [42, 33, 36, 28, 34, 38, 40];
+              newLabel = "평균 독서 시간(시간)";
+              break;
+          }
+
+          departmentChart.data.datasets[0].data = newData;
+          departmentChart.data.datasets[0].label = newLabel;
+          departmentChart.update();
+        });
+
+      // 트렌드 타입 변경 이벤트
+      document
+        .getElementById("trend-type")
+        .addEventListener("change", function (e) {
+          const trendType = e.target.value;
+          let newData;
+
+          switch (trendType) {
+            case "all":
+              newData = [985, 1150, 1250, 1380, 1500, 1245];
+              break;
+            case "completed":
+              newData = [420, 495, 530, 580, 625, 540];
+              break;
+            case "started":
+              newData = [565, 655, 720, 800, 875, 705];
+              break;
+          }
+
+          trendChart.data.datasets[0].data = newData;
+          trendChart.update();
+        });
+
+      // 날짜 필터 변경 이벤트
+      document
+        .getElementById("date-filter")
+        .addEventListener("change", function (e) {
+          const dateFilter = e.target.value;
+          let activityCount, avgBooks, participationRate, avgDays;
+
+          switch (dateFilter) {
+            case "today":
+              activityCount = "543명";
+              avgBooks = "0.2권";
+              participationRate = "42.5%";
+              avgDays = "15일";
+              break;
+            case "week":
+              activityCount = "876명";
+              avgBooks = "0.8권";
+              participationRate = "65.2%";
+              avgDays = "14일";
+              break;
+            case "month":
+              activityCount = "1,245명";
+              avgBooks = "3.2권";
+              participationRate = "78.5%";
+              avgDays = "12일";
+              break;
+            case "quarter":
+              activityCount = "1,587명";
+              avgBooks = "8.7권";
+              participationRate = "82.1%";
+              avgDays = "11일";
+              break;
+            case "year":
+              activityCount = "1,892명";
+              avgBooks = "28.5권";
+              participationRate = "86.4%";
+              avgDays = "10일";
+              break;
+          }
+
+          // 통계 카드 업데이트
+          document.querySelectorAll(".stat-card").forEach((card, index) => {
+            const statValue = card.querySelector("h3");
+            if (index === 0) statValue.textContent = activityCount;
+            if (index === 1) statValue.textContent = avgBooks;
+            if (index === 2) statValue.textContent = participationRate;
+            if (index === 3) statValue.textContent = avgDays;
+          });
+
+          // 차트 데이터 업데이트를 위한 가상의 API 호출 시뮬레이션
+          setTimeout(() => {
+            // 여기에 차트 데이터 업데이트 로직 추가
+            // 데모 목적으로는 생략
+          }, 300);
+        });
+
+      // 인터랙티브 기능 추가 - 통계 카드 클릭 이벤트
+      document.querySelectorAll(".stat-card").forEach((card, index) => {
+        card.addEventListener("click", function () {
+          let detailTitle, chartType;
+
+          switch (index) {
+            case 0:
+              detailTitle = "활성 사용자 상세 분석";
+              chartType = "user-activity";
+              break;
+            case 1:
+              detailTitle = "독서량 상세 분석";
+              chartType = "reading-volume";
+              break;
+            case 2:
+              detailTitle = "참여율 상세 분석";
+              chartType = "participation";
+              break;
+            case 3:
+              detailTitle = "완독 시간 상세 분석";
+              chartType = "completion-time";
+              break;
+          }
+
+          // 실제 구현에서는 모달이나 새 페이지로 상세 분석 표시
+          alert(`${detailTitle} 페이지로 이동합니다. (데모용 알림)`);
+        });
+      });
+
+      // 사이드바 아이템 클릭 이벤트
+      document.querySelectorAll(".sidebar-item").forEach((item) => {
+        item.addEventListener("click", function (e) {
+          e.preventDefault();
+
+          // 현재 활성화된 아이템 비활성화
+          document
+            .querySelector(".sidebar-active")
+            .classList.remove("sidebar-active");
+
+          // 클릭한 아이템 활성화
+          this.classList.add("sidebar-active");
+
+          // 실제 구현에서는 해당 페이지로 이동하거나 컨텐츠 로드
+          const pageName = this.textContent.trim();
+          if (pageName !== "종합 대시보드") {
+            alert(`${pageName} 페이지로 이동합니다. (데모용 알림)`);
+          }
+        });
+      });
+
+      // 인기 콘텐츠 테이블 행 클릭 이벤트
+      document.querySelectorAll("tbody tr").forEach((row) => {
+        row.addEventListener("click", function () {
+          const bookTitle = this.querySelector("td:nth-child(2)").textContent;
+          alert(`'${bookTitle}' 상세 정보 페이지로 이동합니다. (데모용 알림)`);
+        });
+      });
+
+      // 공지사항 클릭 이벤트
+      document.querySelectorAll(".border-l-4").forEach((notice) => {
+        notice.addEventListener("click", function () {
+          const noticeTitle = this.querySelector("p:first-child").textContent;
+          alert(
+            `'${noticeTitle}' 공지사항 상세 페이지로 이동합니다. (데모용 알림)`
+          );
+        });
+      });
+
+      // 리포트 다운로드 버튼 클릭 이벤트
+      document
+        .querySelector("button:has(.fa-download)")
+        .addEventListener("click", function () {
+          const dateFilter = document.getElementById("date-filter").value;
+          const periodText = {
+            today: "오늘",
+            week: "이번 주",
+            month: "이번 달",
+            quarter: "이번 분기",
+            year: "올해",
+          }[dateFilter];
+
+          alert(`${periodText} 리포트 다운로드를 시작합니다. (데모용 알림)`);
+        });
+
+      // 최근 활동 및 인기 콘텐츠 '모두 보기' 버튼 클릭 이벤트
+      document.querySelectorAll("button.text-indigo-600").forEach((button) => {
+        button.addEventListener("click", function (e) {
+          e.preventDefault();
+          const parentTitle =
+            this.parentElement.querySelector("h3").textContent;
+          alert(`${parentTitle} 전체 목록 페이지로 이동합니다. (데모용 알림)`);
+        });
+      });
+
+      // 윈도우 리사이즈 이벤트 - 차트 리사이징
+      window.addEventListener("resize", function () {
+        departmentChart.resize();
+        trendChart.resize();
+      });
+
+      // 데이터 자동 새로고침 시뮬레이션 (5분마다)
+      setInterval(() => {
+        // 랜덤 변화값 생성
+        const randomChange = Math.floor(Math.random() * 20) - 10; // -10 ~ 10 사이 랜덤 값
+
+        // 최근 활동에 새 활동 추가 (실제 구현에서는 API 호출)
+        const randomActivity = [
+          "김영수(개발팀)님이 클린 코드를 완독했습니다.",
+          "박지수(기획팀)님이 스크럼 가이드에 메모를 남겼습니다.",
+          "이주연(디자인팀)님이 UX 디자인 패턴을 시작했습니다.",
+          "최민준(마케팅팀)님이 고객 경험 디자인 북클럽에 가입했습니다.",
+        ][Math.floor(Math.random() * 4)];
+
+        console.log(
+          "데이터 새로고침 시뮬레이션: " + new Date().toLocaleTimeString()
+        );
+        console.log("새 활동: " + randomActivity);
+
+        // 실제 구현에서는 UI 업데이트 처리
+      }, 300000); // 5분 = 300,000ms
+    </script>
+  </body>
+</html>
