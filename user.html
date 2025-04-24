@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>밀리 엔터프라이즈 - 임직원용</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* 커스텀 스타일 */
+    .book-cover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    .book-cover:hover {
+      transform: translateY(-5px);
+    }
+    .tab-active {
+      color: #4f46e5;
+      border-bottom: 2px solid #4f46e5;
+    }
+    .progress-ring {
+      transform: rotate(-90deg);
+    }
+    .progress-ring-circle {
+      stroke-dasharray: 283;
+      transition: stroke-dashoffset 0.5s ease;
+    }
+    .highlight {
+      background-color: rgba(250, 204, 21, 0.3);
+      padding: 2px 0;
+    }
+    .nav-item.active {
+      color: #4f46e5;
+      border-color: #4f46e5;
+    }
+    .capacity-chart {
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .page-container {
+      display: none;
+    }
+    .page-container.active {
+      display: block;
+    }
+    .book-detail-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+    }
+    .book-detail-modal.active {
+      display: flex;
+    }
+    .book-club-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+    }
+    .book-club-modal.active {
+      display: flex;
+    }
+    /* 애니메이션 */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    /* 스크롤바 커스터마이징 */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c7d2fe;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4f46e5;
+    }
+    /* 메모 스타일 */
+    .memo-card {
+      border-left: 3px solid #4f46e5;
+    }
+    /* 모바일 네비게이션 */
+    .mobile-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+  <!-- 모바일 헤더 -->
+  <header class="bg-white shadow-sm py-4 px-6 fixed top-0 left-0 w-full z-10 md:hidden">
+    <div class="flex justify-between items-center">
+      <h1 class="font-bold text-xl text-indigo-900">밀리 엔터프라이즈</h1>
+      <div class="flex items-center space-x-4">
+        <button id="search-btn-mobile" class="text-gray-500">
+          <i class="fas fa-search"></i>
+        </button>
+        <button id="notification-btn-mobile" class="text-gray-500 relative">
+          <i class="fas fa-bell"></i>
+          <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">3</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex min-h-screen pt-16 md:pt-0 pb-16 md:pb-0">
+    <!-- 데스크톱 사이드바 -->
+    <aside class="hidden md:block w-64 bg-white shadow-md fixed h-full pt-6">
+      <div class="px-4">
+        <h1 class="font-bold text-xl text-indigo-900 mb-8 text-center">밀리 엔터프라이즈</h1>
+        <div class="mb-10">
+          <div class="px-4 py-4 flex flex-col items-center">
+            <img src="/api/placeholder/80/80" class="h-16 w-16 rounded-full mb-2" alt="profile">
+            <p class="font-medium">김서연</p>
+            <p class="text-sm text-gray-500">UX디자인팀 / 팀장</p>
+            <div class="mt-2 text-xs text-indigo-600 cursor-pointer">
+              <i class="fas fa-cog mr-1"></i> 프로필 설정
+            </div>
+          </div>
+        </div>
+        <div class="space-y-1">
+          <a href="#" data-page="home" class="nav-item active flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-indigo-50 cursor-pointer transition-colors border-l-4 border-indigo-600">
+            <i class="fas fa-home text-lg w-6"></i>
+            <span>홈</span>
+          </a>
+          <a href="#" data-page="discover" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-indigo-50 cursor-pointer transition-colors border-l-4 border-transparent">
+            <i class="fas fa-compass text-lg w-6"></i>
+            <span>도서 탐색</span>
+          </a>
+          <a href="#" data-page="mybooks" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-indigo-50 cursor-pointer transition-colors border-l-4 border-transparent">
+            <i class="fas fa-book text-lg w-6"></i>
+            <span>내 서재</span>
+          </a>
+          <a href="#" data-page="bookclub" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-indigo-50 cursor-pointer transition-colors border-l-4 border-transparent">
+            <i class="fas fa-users text-lg w-6"></i>
+            <span>북클럽</span>
+          </a>
+          <a href="#" data-page="capacity" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-indigo-50 cursor-pointer transition-colors border-l-4 border-transparent">
+            <i class="fas fa-chart-line text-lg w-6"></i>
+            <span>역량 진단</span>
+          </a>
+        </div>
+        <div class="mt-8">
+          <div class="px-4 py-4 bg-indigo-50 rounded-lg">
+            <h3 class="font-medium text-sm mb-2">이번 달 나의 독서</h3>
+            <div class="flex justify-between items-center">
+              <div class="relative h-16 w-16">
+                <svg class="progress-ring" width="60" height="60">
+                  <circle
+                    class="progress-ring-circle bg-ring"
+                    stroke="#e5e7eb" 
+                    stroke-width="4"
+                    fill="transparent"
+                    r="25"
+                    cx="30"
+                    cy="30"/>
+                  <circle
+                    class="progress-ring-circle"
+                    stroke="#4f46e5"
+                    stroke-width="4"
+                    fill="transparent"
+                    r="25"
+                    cx="30"
+                    cy="30"
+                    stroke-dashoffset="188"/>
+                </svg>
+                <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-sm font-medium text-indigo-700">33%</div>
+              </div>
+              <div class="text-right">
+                <p class="text-sm">목표: 3권/월</p>
+                <p class="font-medium">1권 완독</p>
+                <p class="text-xs text-gray-500">현재 2권 진행중</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <main class="flex-1 md:ml-64 px-4 md:px-8 py-6 md:py-8">
+      <!-- 홈 페이지 -->
+      <div id="home-page" class="page-container active animate-fadeIn">
+        <div class="md:flex md:justify-between md:items-center mb-6">
+          <div>
+            <h2 class="text-2xl font-bold mb-1">안녕하세요, 김서연님!</h2>
+            <p class="text-gray-600">이어서 독서하실 책이 기다리고 있어요.</p>
+          </div>
+          <div class="mt-4 md:mt-0 hidden md:block">
+            <div class="relative">
+              <input type="text" placeholder="도서 검색" class="pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-64">
+              <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- 이어보기 섹션 -->
+        <div class="mb-8">
+          <h3 class="text-lg font-semibold mb-4">이어서 읽기</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-white rounded-lg shadow-sm p-4 flex">
+              <img src="/api/placeholder/120/160" alt="디자인 시스템" class="w-20 h-28 object-cover rounded-md book-cover">
+              <div class="ml-4 flex flex-col justify-between flex-1">
+                <div>
+                  <h4 class="font-medium">디자인 시스템</h4>
+                  <p class="text-gray-600 text-sm">앨마 샤틀 외 1명</p>
+                  <div class="mt-2">
+                    <div class="bg-gray-200 h-1 rounded-full w-full">
+                      <div class="bg-indigo-600 h-1 rounded-full" style="width: 68%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">68% 완료 · 6일 전</p>
+                  </div>
+                </div>
+                <button class="text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-full py-1.5 px-4 self-start transition-colors mt-2">계속 읽기</button>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 flex">
+              <img src="/api/placeholder/120/160" alt="애자일 조직 만들기" class="w-20 h-28 object-cover rounded-md book-cover">
+              <div class="ml-4 flex flex-col justify-between flex-1">
+                <div>
+                  <h4 class="font-medium">애자일 조직 만들기</h4>
+                  <p class="text-gray-600 text-sm">제프 서더랜드</p>
+                  <div class="mt-2">
+                    <div class="bg-gray-200 h-1 rounded-full w-full">
+                      <div class="bg-indigo-600 h-1 rounded-full" style="width: 23%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">23% 완료 · 3일 전</p>
+                  </div>
+                </div>
+                <button class="text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-full py-1.5 px-4 self-start transition-colors mt-2">계속 읽기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 역량별 추천 도서 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">UX 역량 강화를 위한 추천</h3>
+            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800">더보기</a>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div class="book-item show-book-detail" data-book-id="1">
+              <img src="/api/placeholder/160/220" alt="UX 디자인 원칙" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">UX 디자인 원칙</h4>
+              <p class="text-gray-600 text-xs">윌리엄 리드웰</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="2">
+              <img src="/api/placeholder/160/220" alt="사용자 스토리 맵" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">사용자 스토리 맵</h4>
+              <p class="text-gray-600 text-xs">제프 패튼</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="3">
+              <img src="/api/placeholder/160/220" alt="디자인 씽킹 바이블" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">디자인 씽킹 바이블</h4>
+              <p class="text-gray-600 text-xs">팀 브라운</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="4">
+              <img src="/api/placeholder/160/220" alt="인터랙션 디자인" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">인터랙션 디자인</h4>
+              <p class="text-gray-600 text-xs">앨런 쿠퍼</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="5">
+              <img src="/api/placeholder/160/220" alt="UX 리서치 방법론" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">UX 리서치 방법론</h4>
+              <p class="text-gray-600 text-xs">브래드 프로스트</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 사내 인기 도서 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">사내 인기 도서</h3>
+            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800">더보기</a>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div class="book-item show-book-detail" data-book-id="6">
+              <img src="/api/placeholder/160/220" alt="디지털 트랜스포메이션 전략" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">디지털 트랜스포메이션 전략</h4>
+              <p class="text-gray-600 text-xs">데이비드 로저스</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="7">
+              <img src="/api/placeholder/160/220" alt="린 스타트업" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">린 스타트업</h4>
+              <p class="text-gray-600 text-xs">에릭 리스</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="8">
+              <img src="/api/placeholder/160/220" alt="하버드 비즈니스 리뷰" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">하버드 비즈니스 리뷰</h4>
+              <p class="text-gray-600 text-xs">HBR 편집부</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="9">
+              <img src="/api/placeholder/160/220" alt="팀 토폴로지" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">팀 토폴로지</h4>
+              <p class="text-gray-600 text-xs">매튜 스켈턴</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="10">
+              <img src="/api/placeholder/160/220" alt="넛지" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">넛지</h4>
+              <p class="text-gray-600 text-xs">리처드 탈러</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 사내 북클럽 활동 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">진행 중인 북클럽</h3>
+            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800">모든 북클럽</a>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white rounded-lg shadow-sm p-4 show-bookclub-detail" data-club-id="1">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="font-medium">UX 디자인 트렌드 읽기</h4>
+                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">진행중</span>
+              </div>
+              <p class="text-sm text-gray-600 mb-3">UX/UI 디자인 트렌드와 사용자 경험에 관한 도서를 함께 읽고 토론하는 모임입니다.</p>
+              <div class="flex items-center text-xs text-gray-500 mb-3">
+                <span class="mr-3"><i class="fas fa-user mr-1"></i> 8명 참여중</span>
+                <span><i class="fas fa-calendar-alt mr-1"></i> 매주 금요일 16:00</span>
+              </div>
+              <div class="flex items-center">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full -ml-1">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full -ml-1">
+                <span class="text-xs ml-2">외 5명</span>
+                <button class="ml-auto text-sm text-indigo-600 hover:text-indigo-800 font-medium">참여하기</button>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 show-bookclub-detail" data-club-id="2">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="font-medium">디자인 시스템 구축하기</h4>
+                <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">모집중</span>
+              </div>
+              <p class="text-sm text-gray-600 mb-3">디자인 시스템 구축과 유지보수에 관한 실무 경험을 공유하는 북클럽입니다.</p>
+              <div class="flex items-center text-xs text-gray-500 mb-3">
+                <span class="mr-3"><i class="fas fa-user mr-1"></i> 5명 참여중</span>
+                <span><i class="fas fa-calendar-alt mr-1"></i> 격주 화요일 12:00</span>
+              </div>
+              <div class="flex items-center">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full -ml-1">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full -ml-1">
+                <span class="text-xs ml-2">외 2명</span>
+                <button class="ml-auto text-sm text-indigo-600 hover:text-indigo-800 font-medium">참여하기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 도서 탐색 페이지 -->
+      <div id="discover-page" class="page-container animate-fadeIn">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold mb-1">도서 탐색</h2>
+          <p class="text-gray-600">업무 역량 향상을 위한 다양한 도서를 찾아보세요.</p>
+        </div>
+
+        <!-- 검색 영역 -->
+        <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+          <div class="flex flex-col md:flex-row md:items-center gap-4">
+            <div class="flex-1">
+              <div class="relative">
+                <input type="text" placeholder="도서명, 저자, 키워드로 검색" class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full">
+                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <select class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-max">
+                <option value="">카테고리 전체</option>
+                <option value="management">경영/리더십</option>
+                <option value="tech">기술/IT</option>
+                <option value="marketing">마케팅/세일즈</option>
+                <option value="design">디자인/UX</option>
+                <option value="data">데이터/분석</option>
+              </select>
+              <select class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-max">
+                <option value="">역량 전체</option>
+                <option value="leadership">리더십</option>
+                <option value="communication">커뮤니케이션</option>
+                <option value="problemsolving">문제해결</option>
+                <option value="creativity">창의성</option>
+                <option value="data">데이터 분석</option>
+              </select>
+              <button class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2 text-sm transition-colors">
+                <i class="fas fa-filter mr-1"></i> 필터
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 인기 카테고리 -->
+        <div class="mb-8">
+          <h3 class="text-lg font-semibold mb-4">인기 카테고리</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+            <div class="bg-white rounded-lg shadow-sm p-4 flex flex-col items-center hover:shadow-md cursor-pointer transition-shadow">
+              <div class="bg-blue-100 text-blue-800 p-3 rounded-full mb-2">
+                <i class="fas fa-chart-line text-lg"></i>
+              </div>
+              <span class="text-sm font-medium">경영/리더십</span>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 flex flex-col items-center hover:shadow-md cursor-pointer transition-shadow">
+              <div class="bg-purple-100 text-purple-800 p-3 rounded-full mb-2">
+                <i class="fas fa-laptop-code text-lg"></i>
+              </div>
+              <span class="text-sm font-medium">기술/IT</span>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 flex flex-col items-center hover:shadow-md cursor-pointer transition-shadow">
+              <div class="bg-green-100 text-green-800 p-3 rounded-full mb-2">
+                <i class="fas fa-comments-dollar text-lg"></i>
+              </div>
+              <span class="text-sm font-medium">마케팅/세일즈</span>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 flex flex-col items-center hover:shadow-md cursor-pointer transition-shadow">
+              <div class="bg-pink-100 text-pink-800 p-3 rounded-full mb-2">
+                <i class="fas fa-paint-brush text-lg"></i>
+              </div>
+              <span class="text-sm font-medium">디자인/UX</span>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 flex flex-col items-center hover:shadow-md cursor-pointer transition-shadow">
+              <div class="bg-yellow-100 text-yellow-800 p-3 rounded-full mb-2">
+                <i class="fas fa-chart-pie text-lg"></i>
+              </div>
+              <span class="text-sm font-medium">데이터/분석</span>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 flex flex-col items-center hover:shadow-md cursor-pointer transition-shadow">
+              <div class="bg-red-100 text-red-800 p-3 rounded-full mb-2">
+                <i class="fas fa-brain text-lg"></i>
+              </div>
+              <span class="text-sm font-medium">자기계발</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 추천 도서 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">나의 관심 분야 추천 도서</h3>
+            <div class="flex space-x-2">
+              <button class="text-gray-400 hover:text-gray-600 transition-colors">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button class="text-gray-400 hover:text-gray-600 transition-colors">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div class="book-item show-book-detail" data-book-id="11">
+              <img src="/api/placeholder/160/220" alt="디자인 씽킹" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">디자인 씽킹</h4>
+              <p class="text-gray-600 text-xs">톰 켈리</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="12">
+              <img src="/api/placeholder/160/220" alt="정보 디자인" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">정보 디자인</h4>
+              <p class="text-gray-600 text-xs">로버트 제이콥슨</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="13">
+              <img src="/api/placeholder/160/220" alt="경험 디자인" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">경험 디자인</h4>
+              <p class="text-gray-600 text-xs">제시 제임스 가렛</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="14">
+              <img src="/api/placeholder/160/220" alt="모바일 UX 디자인" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">모바일 UX 디자인</h4>
+              <p class="text-gray-600 text-xs">맷 존스</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="15">
+              <img src="/api/placeholder/160/220" alt="서비스 디자인 씽킹" class="w-full object-cover rounded-md book-cover mb-2">
+              <h4 class="font-medium text-sm">서비스 디자인 씽킹</h4>
+              <p class="text-gray-600 text-xs">마크 스틱돈</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 역량별 추천 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">역량별 추천 도서</h3>
+            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800">더보기</a>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white rounded-lg shadow-sm p-4">
+              <div class="flex items-center mb-4">
+                <div class="bg-indigo-100 p-2 rounded-full">
+                  <i class="fas fa-lightbulb text-indigo-600"></i>
+                </div>
+                <h4 class="font-medium ml-3">창의적 사고</h4>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="book-item show-book-detail" data-book-id="16">
+                  <img src="/api/placeholder/120/160" alt="생각의 탄생" class="w-full object-cover rounded-md book-cover mb-1">
+                  <h5 class="text-xs font-medium">생각의 탄생</h5>
+                  <p class="text-gray-600 text-xs">로버트 루트번스타인</p>
+                </div>
+                <div class="book-item show-book-detail" data-book-id="17">
+                  <img src="/api/placeholder/120/160" alt="창의적 본능" class="w-full object-cover rounded-md book-cover mb-1">
+                  <h5 class="text-xs font-medium">창의적 본능</h5>
+                  <p class="text-gray-600 text-xs">톰 켈리</p>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4">
+              <div class="flex items-center mb-4">
+                <div class="bg-green-100 p-2 rounded-full">
+                  <i class="fas fa-comments text-green-600"></i>
+                </div>
+                <h4 class="font-medium ml-3">커뮤니케이션</h4>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="book-item show-book-detail" data-book-id="18">
+                  <img src="/api/placeholder/120/160" alt="비폭력 대화" class="w-full object-cover rounded-md book-cover mb-1">
+                  <h5 class="text-xs font-medium">비폭력 대화</h5>
+                  <p class="text-gray-600 text-xs">마셜 로젠버그</p>
+                </div>
+                <div class="book-item show-book-detail" data-book-id="19">
+                  <img src="/api/placeholder/120/160" alt="사피엔스의 마음" class="w-full object-cover rounded-md book-cover mb-1">
+                  <h5 class="text-xs font-medium">사피엔스의 마음</h5>
+                  <p class="text-gray-600 text-xs">닉 모건</p>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4">
+              <div class="flex items-center mb-4">
+                <div class="bg-purple-100 p-2 rounded-full">
+                  <i class="fas fa-chart-network text-purple-600"></i>
+                </div>
+                <h4 class="font-medium ml-3">리더십</h4>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="book-item show-book-detail" data-book-id="20">
+                  <img src="/api/placeholder/120/160" alt="심리적 안전감" class="w-full object-cover rounded-md book-cover mb-1">
+                  <h5 class="text-xs font-medium">심리적 안전감</h5>
+                  <p class="text-gray-600 text-xs">에이미 에드먼슨</p>
+                </div>
+                <div class="book-item show-book-detail" data-book-id="21">
+                  <img src="/api/placeholder/120/160" alt="팀장의 무기" class="w-full object-cover rounded-md book-cover mb-1">
+                  <h5 class="text-xs font-medium">팀장의 무기</h5>
+                  <p class="text-gray-600 text-xs">김성태</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 최근 출시된 도서 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">최근 출시된 도서</h3>
+            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800">더보기</a>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div class="book-item show-book-detail" data-book-id="22">
+              <div class="relative">
+                <img src="/api/placeholder/160/220" alt="디자인 전략 가이드" class="w-full object-cover rounded-md book-cover mb-2">
+                <span class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">New</span>
+              </div>
+              <h4 class="font-medium text-sm">디자인 전략 가이드</h4>
+              <p class="text-gray-600 text-xs">리디아 화이트</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="23">
+              <div class="relative">
+                <img src="/api/placeholder/160/220" alt="메타버스 디자인" class="w-full object-cover rounded-md book-cover mb-2">
+                <span class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">New</span>
+              </div>
+              <h4 class="font-medium text-sm">메타버스 디자인</h4>
+              <p class="text-gray-600 text-xs">매튜 볼</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="24">
+              <div class="relative">
+                <img src="/api/placeholder/160/220" alt="디지털 윤리학" class="w-full object-cover rounded-md book-cover mb-2">
+                <span class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">New</span>
+              </div>
+              <h4 class="font-medium text-sm">디지털 윤리학</h4>
+              <p class="text-gray-600 text-xs">리사 함멜</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="25">
+              <div class="relative">
+                <img src="/api/placeholder/160/220" alt="AI와 사용자 경험" class="w-full object-cover rounded-md book-cover mb-2">
+                <span class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">New</span>
+              </div>
+              <h4 class="font-medium text-sm">AI와 사용자 경험</h4>
+              <p class="text-gray-600 text-xs">조슈아 클라크</p>
+            </div>
+            <div class="book-item show-book-detail" data-book-id="26">
+              <div class="relative">
+                <img src="/api/placeholder/160/220" alt="비즈니스 디자인" class="w-full object-cover rounded-md book-cover mb-2">
+                <span class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">New</span>
+              </div>
+              <h4 class="font-medium text-sm">비즈니스 디자인</h4>
+              <p class="text-gray-600 text-xs">알렉스 오스터왈더</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 내 서재 페이지 -->
+      <div id="mybooks-page" class="page-container animate-fadeIn">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold mb-1">내 서재</h2>
+          <p class="text-gray-600">나의 독서 활동과 관심 있는 도서를 관리하세요.</p>
+        </div>
+
+        <!-- 내 독서 현황 -->
+        <div class="mb-8">
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold mb-6">나의 독서 현황</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div class="flex flex-col items-center">
+                <div class="relative h-24 w-24 mb-3">
+                  <svg class="progress-ring" width="96" height="96">
+                    <circle
+                      class="progress-ring-circle bg-ring"
+                      stroke="#e5e7eb" 
+                      stroke-width="6"
+                      fill="transparent"
+                      r="42"
+                      cx="48"
+                      cy="48"/>
+                    <circle
+                      class="progress-ring-circle"
+                      stroke="#4f46e5"
+                      stroke-width="6"
+                      fill="transparent"
+                      r="42"
+                      cx="48"
+                      cy="48"
+                      stroke-dashoffset="188"/>
+                  </svg>
+                  <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-lg font-medium text-indigo-700">33%</div>
+                </div>
+                <p class="font-medium text-center">월별 독서 목표</p>
+                <p class="text-sm text-gray-500 text-center">1/3권 완독</p>
+              </div>
+              <div class="bg-indigo-50 rounded-xl p-4 flex flex-col items-center justify-center">
+                <h4 class="text-3xl font-bold text-indigo-600 mb-1">12</h4>
+                <p class="text-sm text-gray-600">올해 완독한 도서</p>
+              </div>
+              <div class="bg-blue-50 rounded-xl p-4 flex flex-col items-center justify-center">
+                <h4 class="text-3xl font-bold text-blue-600 mb-1">856</h4>
+                <p class="text-sm text-gray-600">누적 독서 시간</p>
+              </div>
+              <div class="bg-green-50 rounded-xl p-4 flex flex-col items-center justify-center">
+                <h4 class="text-3xl font-bold text-green-600 mb-1">15</h4>
+                <p class="text-sm text-gray-600">북마크한 도서</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 카테고리 탭 -->
+        <div class="mb-6">
+          <div class="border-b border-gray-200">
+            <div class="flex space-x-8">
+              <button class="px-1 py-4 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600 tab-active">읽고 있는 도서</button>
+              <button class="px-1 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300">완독한 도서</button>
+              <button class="px-1 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300">보관함</button>
+              <button class="px-1 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300">메모</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 읽고 있는 도서 목록 -->
+        <div class="mb-8">
+          <div class="grid grid-cols-1 gap-4">
+            <div class="bg-white rounded-lg shadow-sm p-4 flex">
+              <img src="/api/placeholder/120/160" alt="디자인 시스템" class="w-20 h-28 object-cover rounded-md book-cover">
+              <div class="ml-4 flex flex-col justify-between flex-1">
+                <div>
+                  <div class="flex justify-between">
+                    <h4 class="font-medium">디자인 시스템</h4>
+                    <span class="text-xs text-gray-500">마지막 읽은 날: 6일 전</span>
+                  </div>
+                  <p class="text-gray-600 text-sm">앨마 샤틀 외 1명</p>
+                  <div class="mt-2">
+                    <div class="bg-gray-200 h-1 rounded-full w-full">
+                      <div class="bg-indigo-600 h-1 rounded-full" style="width: 68%"></div>
+                    </div>
+                    <div class="flex justify-between mt-1">
+                      <p class="text-xs text-gray-500">68% 완료</p>
+                      <p class="text-xs text-gray-500">남은 예상 시간: 2시간 30분</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex space-x-2 mt-4">
+                  <button class="text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-full py-1.5 px-4 transition-colors">계속 읽기</button>
+                  <button class="text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full py-1.5 px-4 transition-colors">메모 보기</button>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 flex">
+              <img src="/api/placeholder/120/160" alt="애자일 조직 만들기" class="w-20 h-28 object-cover rounded-md book-cover">
+              <div class="ml-4 flex flex-col justify-between flex-1">
+                <div>
+                  <div class="flex justify-between">
+                    <h4 class="font-medium">애자일 조직 만들기</h4>
+                    <span class="text-xs text-gray-500">마지막 읽은 날: 3일 전</span>
+                  </div>
+                  <p class="text-gray-600 text-sm">제프 서더랜드</p>
+                  <div class="mt-2">
+                    <div class="bg-gray-200 h-1 rounded-full w-full">
+                      <div class="bg-indigo-600 h-1 rounded-full" style="width: 23%"></div>
+                    </div>
+                    <div class="flex justify-between mt-1">
+                      <p class="text-xs text-gray-500">23% 완료</p>
+                      <p class="text-xs text-gray-500">남은 예상 시간: 4시간 45분</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex space-x-2 mt-4">
+                  <button class="text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-full py-1.5 px-4 transition-colors">계속 읽기</button>
+                  <button class="text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full py-1.5 px-4 transition-colors">메모 보기</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 최근 메모 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">최근 메모</h3>
+            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800">모든 메모</a>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white rounded-lg shadow-sm p-4 memo-card">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="font-medium">디자인 시스템</h4>
+                <span class="text-xs text-gray-500">2025.04.05</span>
+              </div>
+              <p class="text-sm text-gray-600 mb-3">디자인 시스템의 핵심은 재사용 가능한 컴포넌트와 패턴을 조합하여 전체 제품 디자인을 구성하는 것. 이는 일관성을 유지하고 설계 시간을 단축시키는데 중요한 역할을 함.</p>
+              <p class="text-xs text-gray-500">p.78</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 memo-card">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="font-medium">애자일 조직 만들기</h4>
+                <span class="text-xs text-gray-500">2025.04.02</span>
+              </div>
+              <p class="text-sm text-gray-600 mb-3">애자일 조직에서는 '빠른 실패, 빠른 학습'이 중요하다. 실패를 두려워하지 않고 빠르게 시도하고 배우는 문화가 혁신을 이끄는 핵심이다.</p>
+              <p class="text-xs text-gray-500">p.42</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 북클럽 페이지 -->
+      <div id="bookclub-page" class="page-container animate-fadeIn">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold mb-1">북클럽</h2>
+          <p class="text-gray-600">동료들과 함께 책을 읽고 생각을 나누세요.</p>
+        </div>
+
+        <!-- 내 북클럽 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">내가 참여 중인 북클럽</h3>
+            <button class="text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg py-2 px-4 transition-colors">
+              <i class="fas fa-plus mr-1"></i> 북클럽 만들기
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white rounded-lg shadow-sm p-4 show-bookclub-detail" data-club-id="1">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="font-medium">UX 디자인 트렌드 읽기</h4>
+                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">진행중</span>
+              </div>
+              <p class="text-sm text-gray-600 mb-3">UX/UI 디자인 트렌드와 사용자 경험에 관한 도서를 함께 읽고 토론하는 모임입니다.</p>
+              <div class="mb-3">
+                <p class="text-xs text-gray-600 mb-1">현재 읽는 책:</p>
+                <div class="flex items-center">
+                  <img src="/api/placeholder/40/56" alt="UX 디자인 원칙" class="h-7 rounded mr-2">
+                  <span class="text-sm">UX 디자인 원칙 (윌리엄 리드웰)</span>
+                </div>
+              </div>
+              <div class="flex items-center text-xs text-gray-500 mb-3">
+                <span class="mr-3"><i class="fas fa-user mr-1"></i> 8명 참여중</span>
+                <span><i class="fas fa-calendar-alt mr-1"></i> 매주 금요일 16:00</span>
+              </div>
+              <div class="flex items-center">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full -ml-1">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full -ml-1">
+                <span class="text-xs ml-2">외 5명</span>
+                <button class="ml-auto text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded-full py-1.5 px-4 transition-colors">입장하기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 추천 북클럽 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">추천 북클럽</h3>
+            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800">모든 북클럽</a>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white rounded-lg shadow-sm p-4 show-bookclub-detail" data-club-id="2">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="font-medium">디자인 시스템 구축하기</h4>
+                <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">모집중</span>
+              </div>
+              <p class="text-sm text-gray-600 mb-3">디자인 시스템 구축과 유지보수에 관한 실무 경험을 공유하는 북클럽입니다.</p>
+              <div class="mb-3">
+                <p class="text-xs text-gray-600 mb-1">현재 읽는 책:</p>
+                <div class="flex items-center">
+                  <img src="/api/placeholder/40/56" alt="디자인 시스템" class="h-7 rounded mr-2">
+                  <span class="text-sm">디자인 시스템 (앨마 샤틀)</span>
+                </div>
+              </div>
+              <div class="flex items-center text-xs text-gray-500 mb-3">
+                <span class="mr-3"><i class="fas fa-user mr-1"></i> 5명 참여중</span>
+                <span><i class="fas fa-calendar-alt mr-1"></i> 격주 화요일 12:00</span>
+              </div>
+              <div class="flex items-center">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full -ml-1">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full -ml-1">
+                <span class="text-xs ml-2">외 2명</span>
+                <button class="ml-auto text-sm text-indigo-600 hover:text-indigo-800 font-medium">참여하기</button>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 show-bookclub-detail" data-club-id="3">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="font-medium">데이터 기반 의사결정</h4>
+                <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">모집중</span>
+              </div>
+              <p class="text-sm text-gray-600 mb-3">데이터를 활용한 의사결정과 분석에 관한 도서를 함께 읽는 북클럽입니다.</p>
+              <div class="mb-3">
+                <p class="text-xs text-gray-600 mb-1">현재 읽는 책:</p>
+                <div class="flex items-center">
+                  <img src="/api/placeholder/40/56" alt="데이터 분석의 힘" class="h-7 rounded mr-2">
+                  <span class="text-sm">데이터 분석의 힘 (애널리 오서</span>
+                </div>
+              </div>
+              <div class="flex items-center text-xs text-gray-500 mb-3">
+                <span class="mr-3"><i class="fas fa-user mr-1"></i> 6명 참여중</span>
+                <span><i class="fas fa-calendar-alt mr-1"></i> 매주 수요일 13:00</span>
+              </div>
+              <div class="flex items-center">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full -ml-1">
+                <img src="/api/placeholder/30/30" alt="프로필" class="w-6 h-6 rounded-full -ml-1">
+                <span class="text-xs ml-2">외 3명</span>
+                <button class="ml-auto text-sm text-indigo-600 hover:text-indigo-800 font-medium">참여하기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 인기 토론 주제 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">인기 토론 주제</h3>
+            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800">모든토론</a>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+          <div class="flex justify-between items-start mb-2">
+            <div class="flex items-start">
+              <img src="/api/placeholder/40/40" alt="프로필" class="w-8 h-8 rounded-full mr-3">
+              <div>
+                <h4 class="font-medium text-sm">디자인 시스템의 장점과 구축 과정에서의 어려움</h4>
+                <p class="text-xs text-gray-500">UX 디자인 트렌드 읽기 · 김민준 · 3일 전</p>
+              </div>
+            </div>
+            <div class="flex items-center text-xs text-gray-500">
+              <span class="mr-3"><i class="far fa-comment mr-1"></i> 12</span>
+              <span><i class="far fa-heart mr-1"></i> 24</span>
+            </div>
+          </div>
+          <p class="text-sm text-gray-600 mb-3">디자인 시스템을 구축할 때 가장 어려웠던 부분이 무엇인가요? 저희 팀은 컴포넌트 재사용성과 일관성 유지 사이에서 균형을 맞추는 게 어려웠는데, 다른 분들의 경험이 궁금합니다.</p>
+          <button class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">토론 참여하기</button>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+          <div class="flex justify-between items-start mb-2">
+            <div class="flex items-start">
+              <img src="/api/placeholder/40/40" alt="프로필" class="w-8 h-8 rounded-full mr-3">
+              <div>
+                <h4 class="font-medium text-sm">애자일 방법론의 실제 적용 사례</h4>
+                <p class="text-xs text-gray-500">애자일 조직 문화 · 이지현 · 5일 전</p>
+              </div>
+            </div>
+            <div class="flex items-center text-xs text-gray-500">
+              <span class="mr-3"><i class="far fa-comment mr-1"></i> 18</span>
+              <span><i class="far fa-heart mr-1"></i> 32</span>
+            </div>
+          </div>
+          <p class="text-sm text-gray-600 mb-3">애자일 방법론을 도입해 성공한 실제 사례가 있으신가요? 특히 기존의 워터폴 방식에서 애자일로 전환하는 과정에서의 팁이나 주의사항이 궁금합니다.</p>
+          <button class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">토론 참여하기</button>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm p-4">
+          <div class="flex justify-between items-start mb-2">
+            <div class="flex items-start">
+              <img src="/api/placeholder/40/40" alt="프로필" class="w-8 h-8 rounded-full mr-3">
+              <div>
+                <h4 class="font-medium text-sm">UX 리서치의 효율적인 방법론</h4>
+                <p class="text-xs text-gray-500">UX 디자인 트렌드 읽기 · 박소연 · 1주일 전</p>
+              </div>
+            </div>
+            <div class="flex items-center text-xs text-gray-500">
+              <span class="mr-3"><i class="far fa-comment mr-1"></i> 15</span>
+              <span><i class="far fa-heart mr-1"></i> 21</span>
+            </div>
+          </div>
+          <p class="text-sm text-gray-600 mb-3">제한된 시간과 자원으로 효과적인 UX 리서치를 진행하는 방법에 대해 의견을 나누고 싶습니다. 특히 원격 리서치 방법이나 적은 인원으로도 의미 있는 결과를 얻을 수 있는 방법이 있을까요?</p>
+          <button class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">토론 참여하기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 역량 진단 페이지 -->
+    <div id="capacity-page" class="page-container animate-fadeIn">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-1">역량 진단</h2>
+        <p class="text-gray-600">나의 역량을 진단하고 성장 계획을 세워보세요.</p>
+      </div>
+
+      <!-- 역량 진단 결과 -->
+      <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-lg font-semibold">나의 역량 진단 결과</h3>
+          <button class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">역량 재진단</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <div class="mb-6">
+              <div class="flex justify-between mb-1">
+                <h4 class="font-medium">UX 디자인</h4>
+                <span class="text-sm text-indigo-600">상위 20%</span>
+              </div>
+              <div class="bg-gray-200 rounded-full h-2.5 capacity-chart">
+                <div class="bg-indigo-600 h-full rounded-full" style="width: 80%"></div>
+              </div>
+            </div>
+            <div class="mb-6">
+              <div class="flex justify-between mb-1">
+                <h4 class="font-medium">UI 디자인</h4>
+                <span class="text-sm text-indigo-600">상위 15%</span>
+              </div>
+              <div class="bg-gray-200 rounded-full h-2.5 capacity-chart">
+                <div class="bg-indigo-600 h-full rounded-full" style="width: 85%"></div>
+              </div>
+            </div>
+            <div class="mb-6">
+              <div class="flex justify-between mb-1">
+                <h4 class="font-medium">인터랙션 디자인</h4>
+                <span class="text-sm text-indigo-600">상위 30%</span>
+              </div>
+              <div class="bg-gray-200 rounded-full h-2.5 capacity-chart">
+                <div class="bg-indigo-600 h-full rounded-full" style="width: 70%"></div>
+              </div>
+            </div>
+            <div class="mb-6">
+              <div class="flex justify-between mb-1">
+                <h4 class="font-medium">UX 리서치</h4>
+                <span class="text-sm text-indigo-600">상위 25%</span>
+              </div>
+              <div class="bg-gray-200 rounded-full h-2.5 capacity-chart">
+                <div class="bg-indigo-600 h-full rounded-full" style="width: 75%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1">
+                <h4 class="font-medium">디자인 시스템</h4>
+                <span class="text-sm text-indigo-600">상위 40%</span>
+              </div>
+              <div class="bg-gray-200 rounded-full h-2.5 capacity-chart">
+                <div class="bg-indigo-600 h-full rounded-full" style="width: 60%"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="mb-6">
+              <div class="flex justify-between mb-1">
+                <h4 class="font-medium">팀 리더십</h4>
+                <span class="text-sm text-indigo-600">상위 35%</span>
+              </div>
+              <div class="bg-gray-200 rounded-full h-2.5 capacity-chart">
+                <div class="bg-indigo-600 h-full rounded-full" style="width: 65%"></div>
+              </div>
+            </div>
+            <div class="mb-6">
+              <div class="flex justify-between mb-1">
+                <h4 class="font-medium">커뮤니케이션</h4>
+                <span class="text-sm text-indigo-600">상위 20%</span>
+              </div>
+              <div class="bg-gray-200 rounded-full h-2.5 capacity-chart">
+                <div class="bg-indigo-600 h-full rounded-full" style="width: 80%"></div>
+              </div>
+            </div>
+            <div class="mb-6">
+              <div class="flex justify-between mb-1">
+                <h4 class="font-medium">문제 해결 능력</h4>
+                <span class="text-sm text-indigo-600">상위 25%</span>
+              </div>
+              <div class="bg-gray-200 rounded-full h-2.5 capacity-chart">
+                <div class="bg-indigo-600 h-full rounded-full" style="width: 75%"></div>
+              </div>
+            </div>
+            <div class="mb-6">
+              <div class="flex justify-between mb-1">
+                <h4 class="font-medium">창의적 사고</h4>
+                <span class="text-sm text-indigo-600">상위 15%</span>
+              </div>
+              <div class="bg-gray-200 rounded-full h-2.5 capacity-chart">
+                <div class="bg-indigo-600 h-full rounded-full" style="width: 85%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1">
+                <h4 class="font-medium">협업</h4>
+                <span class="text-sm text-indigo-600">상위 20%</span>
+              </div>
+              <div class="bg-gray-200 rounded-full h-2.5 capacity-chart">
+                <div class="bg-indigo-600 h-full rounded-full" style="width: 80%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-8 pt-6 border-t border-gray-200">
+          <h4 class="font-medium mb-3">최근 진단일</h4>
+          <p class="text-sm text-gray-600">2025년 3월 15일 (약 1개월 전)</p>
+        </div>
+      </div>
+
+      <!-- 맞춤 역량 향상 추천 -->
+      <div class="mb-8">
+        <h3 class="text-lg font-semibold mb-4">맞춤 역량 향상 추천</h3>
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <div class="mb-6 pb-6 border-b border-gray-200">
+            <h4 class="font-medium mb-3">디자인 시스템 역량 강화</h4>
+            <p class="text-sm text-gray-600 mb-4">현재 디자인 시스템 역량이 다른 역량에 비해 상대적으로 낮습니다. 다음과 같은 방법으로 역량을 강화해 보세요.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-indigo-50 rounded-lg p-4">
+                <h5 class="text-sm font-medium text-indigo-800 mb-2">추천 도서</h5>
+                <div class="flex items-center mb-2">
+                  <img src="/api/placeholder/40/56" alt="디자인 시스템" class="h-7 rounded mr-2">
+                  <span class="text-sm">디자인 시스템 (앨마 샤틀)</span>
+                </div>
+                <div class="flex items-center">
+                  <img src="/api/placeholder/40/56" alt="디자인 시스템 구축 가이드" class="h-7 rounded mr-2">
+                  <span class="text-sm">디자인 시스템 구축 가이드 (에바 가스카)</span>
+                </div>
+              </div>
+              <div class="bg-blue-50 rounded-lg p-4">
+                <h5 class="text-sm font-medium text-blue-800 mb-2">추천 북클럽</h5>
+                <div class="flex items-start mb-2">
+                  <i class="fas fa-users text-blue-600 mt-1 mr-2"></i>
+                  <div>
+                    <p class="text-sm font-medium">디자인 시스템 구축하기</p>
+                    <p class="text-xs text-gray-600">격주 화요일 12:00 (5명 참여중)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h4 class="font-medium mb-3">UX 리서치 역량 향상</h4>
+            <p class="text-sm text-gray-600 mb-4">UX 리서치 역량을 더욱 높이면 UX 디자인 역량과 시너지를 낼 수 있습니다. 다음 학습 경로를 추천합니다.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-indigo-50 rounded-lg p-4">
+                <h5 class="text-sm font-medium text-indigo-800 mb-2">추천 도서</h5>
+                <div class="flex items-center mb-2">
+                  <img src="/api/placeholder/40/56" alt="UX 리서치 방법론" class="h-7 rounded mr-2">
+                  <span class="text-sm">UX 리서치 방법론 (브래드 프로스트)</span>
+                </div>
+                <div class="flex items-center">
+                  <img src="/api/placeholder/40/56" alt="사용자 인터뷰" class="h-7 rounded mr-2">
+                  <span class="text-sm">사용자 인터뷰 (스티브 포티겔)</span>
+                </div>
+              </div>
+              <div class="bg-green-50 rounded-lg p-4">
+                <h5 class="text-sm font-medium text-green-800 mb-2">추천 학습 경로</h5>
+                <ul class="text-sm space-y-2">
+                  <li class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
+                    <span>UX 리서치 기본 → 심화 과정 (6주)</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
+                    <span>사용자 인터뷰 및 데이터 분석 워크숍 (2일)</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- 모바일 네비게이션 -->
+<nav class="mobile-nav bg-white shadow-md py-3 md:hidden">
+  <div class="flex justify-around">
+    <a href="#" data-page="home" class="flex flex-col items-center text-indigo-600">
+      <i class="fas fa-home text-lg"></i>
+      <span class="text-xs mt-1">홈</span>
+    </a>
+    <a href="#" data-page="discover" class="flex flex-col items-center text-gray-500">
+      <i class="fas fa-compass text-lg"></i>
+      <span class="text-xs mt-1">탐색</span>
+    </a>
+    <a href="#" data-page="mybooks" class="flex flex-col items-center text-gray-500">
+      <i class="fas fa-book text-lg"></i>
+      <span class="text-xs mt-1">서재</span>
+    </a>
+    <a href="#" data-page="bookclub" class="flex flex-col items-center text-gray-500">
+      <i class="fas fa-users text-lg"></i>
+      <span class="text-xs mt-1">북클럽</span>
+    </a>
+    <a href="#" data-page="capacity" class="flex flex-col items-center text-gray-500">
+      <i class="fas fa-chart-line text-lg"></i>
+      <span class="text-xs mt-1">역량</span>
+    </a>
+  </div>
+</nav>
+
+<!-- 도서 상세 모달 -->
+<div class="book-detail-modal" id="book-detail-modal">
+  <div class="bg-white rounded-lg w-11/12 max-w-3xl max-h-screen overflow-y-auto">
+    <div class="relative">
+      <button class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 close-modal">
+        <i class="fas fa-times text-lg"></i>
+      </button>
+      <div class="p-6">
+        <div class="flex flex-col md:flex-row">
+          <img src="/api/placeholder/200/280" alt="UX 디자인 원칙" class="w-32 h-44 md:w-48 md:h-64 object-cover rounded-md book-cover mx-auto md:mx-0">
+          <div class="mt-6 md:mt-0 md:ml-8 flex-1">
+            <h2 class="text-2xl font-bold">UX 디자인 원칙</h2>
+            <p class="text-gray-600 mb-4">윌리엄 리드웰</p>
+            <div class="flex items-center mb-4">
+              <div class="flex text-yellow-400">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+              </div>
+              <span class="text-sm text-gray-500 ml-2">4.5 (32명 평가)</span>
+            </div>
+            <div class="space-y-2 mb-6">
+              <div class="flex items-start">
+                <span class="text-gray-500 w-24">출판사</span>
+                <span>에이콘출판사</span>
+              </div>
+              <div class="flex items-start">
+                <span class="text-gray-500 w-24">출판일</span>
+                <span>2024년 1월 15일</span>
+              </div>
+              <div class="flex items-start">
+                <span class="text-gray-500 w-24">페이지 수</span>
+                <span>384 페이지</span>
+              </div>
+              <div class="flex items-start">
+                <span class="text-gray-500 w-24">카테고리</span>
+                <span>디자인/UX</span>
+              </div>
+              <div class="flex items-start">
+                <span class="text-gray-500 w-24">ISBN</span>
+                <span>979-11-6051-320-5</span>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                읽기 시작
+              </button>
+              <button class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-6 rounded-lg transition-colors">
+                <i class="far fa-bookmark mr-2"></i>보관함에 추가
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="mt-8">
+          <h3 class="text-lg font-semibold mb-4">책 소개</h3>
+          <p class="text-gray-600 leading-relaxed">
+            UX 디자인 원칙은 인터페이스 디자인의 기본 원칙과 패턴을 설명하는 책으로, 사용자 경험(UX)을 향상시키기 위한 실용적인 가이드를 제공합니다. 인지 심리학 연구를 바탕으로 한 125가지 디자인 원칙을 소개하며, 각 원칙의 역사적 배경과 현대적 적용 방법을 풍부한 예시와 함께 설명합니다.
+            <br><br>
+            이 책은 디자이너뿐만 아니라 제품 관리자, 개발자, 그리고 UX에 관심 있는 모든 사람들에게 유용한 참고서입니다. 각 원칙은 실제 프로젝트에 바로 적용할 수 있도록 명확한 설명과 시각적 예시를 포함하고 있어, 이론과 실무를 모두 아우르는 종합적인 학습 경험을 제공합니다.
+          </p>
+        </div>
+        <div class="mt-8">
+          <h3 class="text-lg font-semibold mb-4">주요 내용</h3>
+          <ul class="space-y-3 text-gray-600">
+            <li class="flex items-start">
+              <i class="fas fa-check text-indigo-600 mt-1 mr-3"></i>
+              <span>사용자 경험 디자인의 기본 원칙과 패턴</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-indigo-600 mt-1 mr-3"></i>
+              <span>인지 심리학 연구를 바탕으로 한 125가지 디자인 원칙</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-indigo-600 mt-1 mr-3"></i>
+              <span>각 원칙의 역사적 배경과 현대적 적용 방법</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-indigo-600 mt-1 mr-3"></i>
+              <span>실제 프로젝트에 바로 적용할 수 있는 실용적인 가이드</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-indigo-600 mt-1 mr-3"></i>
+              <span>디자이너, 제품 관리자, 개발자를 위한 종합적인 UX 참고서</span>
+            </li>
+          </ul>
+        </div>
+        <div class="mt-8">
+          <h3 class="text-lg font-semibold mb-4">독자 리뷰</h3>
+          <div class="space-y-4">
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="flex justify-between items-center mb-2">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/40/40" alt="프로필" class="w-8 h-8 rounded-full mr-3">
+                  <div>
+                    <h5 class="font-medium text-sm">김지훈</h5>
+                    <div class="flex text-yellow-400 text-xs">
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                    </div>
+                  </div>
+                </div>
+                <span class="text-xs text-gray-500">2025.03.12</span>
+              </div>
+              <p class="text-sm text-gray-600">
+                UX 디자이너로 일하면서 항상 참고하는 책입니다. 이론적인 내용뿐만 아니라 실무에 바로 적용할 수 있는 다양한 예시와 팁이 담겨 있어서 매우 유용합니다. 특히 인지 심리학 기반의 설명이 이해하기 쉽게 되어 있어 디자인 결정을 내릴 때 많은 도움이 됩니다.
+              </p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="flex justify-between items-center mb-2">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/40/40" alt="프로필" class="w-8 h-8 rounded-full mr-3">
+                  <div>
+                    <h5 class="font-medium text-sm">박소연</h5>
+                    <div class="flex text-yellow-400 text-xs">
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="far fa-star"></i>
+                    </div>
+                  </div>
+                </div>
+                <span class="text-xs text-gray-500">2025.02.28</span>
+              </div>
+              <p class="text-sm text-gray-600">
+                UX 분야의 고전이라고 할 수 있는 책입니다. 다양한 원칙들을 체계적으로 정리해 놓아서 필요할 때마다 찾아보기 좋습니다. 다만 최신 디지털 환경의 예시가 좀 더 많았으면 하는 아쉬움이 있습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 북클럽 상세 모달 -->
+<div class="book-club-modal" id="bookclub-detail-modal">
+  <div class="bg-white rounded-lg w-11/12 max-w-3xl max-h-screen overflow-y-auto">
+    <div class="relative">
+      <button class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 close-modal">
+        <i class="fas fa-times text-lg"></i>
+      </button>
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold">UX 디자인 트렌드 읽기</h2>
+          <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">진행중</span>
+        </div>
+        <div class="flex flex-col md:flex-row gap-6">
+          <div class="md:w-2/3">
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold mb-2">북클럽 소개</h3>
+              <p class="text-gray-600">
+                UX/UI 디자인 트렌드와 사용자 경험에 관한 도서를 함께 읽고 토론하는 모임입니다. 디자인 분야에서 일하는 사람들이 모여 최신 트렌드와 실무 경험을 공유하는 자리로, 디자이너뿐만 아니라 개발자, 기획자 등 다양한 직군의 참여를 환영합니다.
+              </p>
+            </div>
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold mb-2">진행 방식</h3>
+              <ul class="space-y-2 text-gray-600">
+                <li class="flex items-start">
+                  <i class="fas fa-check text-indigo-600 mt-1 mr-3"></i>
+                  <span>격주로 정해진 책의 일정 부분을 읽고 온라인/오프라인 모임에서 토론</span>
+                </li>
+                <li class="flex items-start">
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-indigo-600 mt-1 mr-3"></i>
+                        <span>참가자들은 돌아가며 토론 주제를 준비하고 진행</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-check text-indigo-600 mt-1 mr-3"></i>
+                        <span>실무에서 적용할 수 있는 인사이트와 경험 공유 중심의 대화</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-check text-indigo-600 mt-1 mr-3"></i>
+                        <span>분기별로 새로운 도서를 선정하여 다양한 주제 탐색</span>
+                      </li>
+                      </ul>
+                      </div>
+                      <div class="mb-6">
+                      <h3 class="text-lg font-semibold mb-2">현재 읽고 있는 책</h3>
+                      <div class="flex items-start bg-gray-50 rounded-lg p-4">
+                        <img src="/api/placeholder/80/112" alt="UX 디자인 원칙" class="w-16 h-22 object-cover rounded-md book-cover">
+                        <div class="ml-4">
+                          <h4 class="font-medium">UX 디자인 원칙</h4>
+                          <p class="text-gray-600 text-sm mb-2">윌리엄 리드웰</p>
+                          <p class="text-sm text-gray-600">현재 Chapter 5 (사용자 행동 패턴과 인터랙션) 진행 중</p>
+                          <div class="mt-2">
+                            <div class="bg-gray-200 h-1 rounded-full w-full">
+                              <div class="bg-indigo-600 h-1 rounded-full" style="width: 45%"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">전체 진행률: 45%</p>
+                          </div>
+                        </div>
+                      </div>
+                      </div>
+                      <div class="mb-6">
+                      <h3 class="text-lg font-semibold mb-2">다음 모임 일정</h3>
+                      <div class="bg-indigo-50 rounded-lg p-4">
+                        <div class="flex items-center mb-2">
+                          <i class="far fa-calendar-alt text-indigo-600 mr-2"></i>
+                          <span class="font-medium">2025년 4월 26일 (금) 16:00 - 17:30</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">Chapter 5-6 토론 (p.120-185)</p>
+                        <div class="flex items-center text-sm">
+                          <i class="fas fa-map-marker-alt text-indigo-600 mr-2"></i>
+                          <span>6층 회의실 / Zoom 미팅(하이브리드)</span>
+                        </div>
+                      </div>
+                      </div>
+                      </div>
+                      <div class="md:w-1/3">
+                      <div class="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+                      <h3 class="text-lg font-semibold mb-3">북클럽 정보</h3>
+                      <div class="space-y-3">
+                        <div class="flex items-start">
+                          <i class="fas fa-users text-indigo-600 mt-1 w-5"></i>
+                          <div class="ml-3">
+                            <p class="text-sm font-medium">참여 인원</p>
+                            <p class="text-sm text-gray-600">8명 참여중</p>
+                          </div>
+                        </div>
+                        <div class="flex items-start">
+                          <i class="fas fa-calendar-alt text-indigo-600 mt-1 w-5"></i>
+                          <div class="ml-3">
+                            <p class="text-sm font-medium">모임 주기</p>
+                            <p class="text-sm text-gray-600">매주 금요일 16:00</p>
+                          </div>
+                        </div>
+                        <div class="flex items-start">
+                          <i class="fas fa-book text-indigo-600 mt-1 w-5"></i>
+                          <div class="ml-3">
+                            <p class="text-sm font-medium">진행한 도서</p>
+                            <p class="text-sm text-gray-600">총 6권</p>
+                          </div>
+                        </div>
+                        <div class="flex items-start">
+                          <i class="fas fa-user text-indigo-600 mt-1 w-5"></i>
+                          <div class="ml-3">
+                            <p class="text-sm font-medium">운영자</p>
+                            <p class="text-sm text-gray-600">김민준 (UX팀)</p>
+                          </div>
+                        </div>
+                        <div class="flex items-start">
+                          <i class="fas fa-clock text-indigo-600 mt-1 w-5"></i>
+                          <div class="ml-3">
+                            <p class="text-sm font-medium">운영 기간</p>
+                            <p class="text-sm text-gray-600">2024.10 ~ 현재</p>
+                          </div>
+                        </div>
+                      </div>
+                      </div>
+                      <div class="bg-white border border-gray-200 rounded-lg p-4">
+                      <h3 class="text-lg font-semibold mb-3">참여 멤버</h3>
+                      <div class="flex flex-wrap gap-2 mb-3">
+                        <img src="/api/placeholder/40/40" alt="프로필" class="w-8 h-8 rounded-full">
+                        <img src="/api/placeholder/40/40" alt="프로필" class="w-8 h-8 rounded-full">
+                        <img src="/api/placeholder/40/40" alt="프로필" class="w-8 h-8 rounded-full">
+                        <img src="/api/placeholder/40/40" alt="프로필" class="w-8 h-8 rounded-full">
+                        <img src="/api/placeholder/40/40" alt="프로필" class="w-8 h-8 rounded-full">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-600 text-xs">+3</div>
+                      </div>
+                      <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                        참여하기
+                      </button>
+                      </div>
+                      </div>
+                      </div>
+                      <div class="mt-8 border-t border-gray-200 pt-6">
+                      <h3 class="text-lg font-semibold mb-4">지난 도서 목록</h3>
+                      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      <div class="bg-white border border-gray-200 rounded-lg p-3 flex items-center">
+                        <img src="/api/placeholder/60/80" alt="디자인 씽킹 바이블" class="w-12 h-16 object-cover rounded-md book-cover">
+                        <div class="ml-3">
+                          <h4 class="font-medium text-sm">디자인 씽킹 바이블</h4>
+                          <p class="text-gray-600 text-xs">팀 브라운</p>
+                          <p class="text-gray-500 text-xs mt-1">2025.01~03</p>
+                        </div>
+                      </div>
+                      <div class="bg-white border border-gray-200 rounded-lg p-3 flex items-center">
+                        <img src="/api/placeholder/60/80" alt="인터랙션 디자인" class="w-12 h-16 object-cover rounded-md book-cover">
+                        <div class="ml-3">
+                          <h4 class="font-medium text-sm">인터랙션 디자인</h4>
+                          <p class="text-gray-600 text-xs">앨런 쿠퍼</p>
+                          <p class="text-gray-500 text-xs mt-1">2024.10~12</p>
+                        </div>
+                      </div>
+                      <div class="bg-white border border-gray-200 rounded-lg p-3 flex items-center">
+                        <img src="/api/placeholder/60/80" alt="UX 리서치" class="w-12 h-16 object-cover rounded-md book-cover">
+                        <div class="ml-3">
+                          <h4 class="font-medium text-sm">UX 리서치</h4>
+                          <p class="text-gray-600 text-xs">브래드 프로스트</p>
+                          <p class="text-gray-500 text-xs mt-1">2024.07~09</p>
+                        </div>
+                      </div>
+                      </div>
+                      </div>
+                      </div>
+                      </div>
+                      </div>
+                      </div>
+                      
+                      <!-- JavaScript -->
+                      <script>
+                        // 페이지 전환 기능
+                        document.addEventListener('DOMContentLoaded', function() {
+                          // 네비게이션 아이템 클릭 이벤트
+                          const navItems = document.querySelectorAll('.nav-item, .mobile-nav a');
+                          navItems.forEach(item => {
+                            item.addEventListener('click', function(e) {
+                              e.preventDefault();
+                              const targetPage = this.getAttribute('data-page');
+                              
+                              // 현재 활성화된 페이지 비활성화
+                              document.querySelectorAll('.page-container').forEach(page => {
+                                page.classList.remove('active');
+                              });
+                              
+                              // 클릭한 페이지 활성화
+                              document.getElementById(`${targetPage}-page`).classList.add('active');
+                              
+                              // 네비게이션 아이템 활성화 상태 변경
+                              document.querySelectorAll('.nav-item').forEach(nav => {
+                                nav.classList.remove('active');
+                                nav.classList.remove('border-indigo-600');
+                                nav.classList.add('border-transparent');
+                              });
+                              document.querySelectorAll(`.nav-item[data-page="${targetPage}"]`).forEach(nav => {
+                                nav.classList.add('active');
+                                nav.classList.add('border-indigo-600');
+                                nav.classList.remove('border-transparent');
+                              });
+                              
+                              // 모바일 네비게이션 아이템 활성화 상태 변경
+                              document.querySelectorAll('.mobile-nav a').forEach(nav => {
+                                nav.classList.remove('text-indigo-600');
+                                nav.classList.add('text-gray-500');
+                              });
+                              document.querySelectorAll(`.mobile-nav a[data-page="${targetPage}"]`).forEach(nav => {
+                                nav.classList.add('text-indigo-600');
+                                nav.classList.remove('text-gray-500');
+                              });
+                            });
+                          });
+                          
+                          // 도서 상세 모달 표시
+                          const bookItems = document.querySelectorAll('.show-book-detail');
+                          const bookDetailModal = document.getElementById('book-detail-modal');
+                          
+                          bookItems.forEach(item => {
+                            item.addEventListener('click', function() {
+                              bookDetailModal.classList.add('active');
+                              document.body.style.overflow = 'hidden';
+                            });
+                          });
+                          
+                          // 북클럽 상세 모달 표시
+                          const bookclubItems = document.querySelectorAll('.show-bookclub-detail');
+                          const bookclubDetailModal = document.getElementById('bookclub-detail-modal');
+                          
+                          bookclubItems.forEach(item => {
+                            item.addEventListener('click', function() {
+                              bookclubDetailModal.classList.add('active');
+                              document.body.style.overflow = 'hidden';
+                            });
+                          });
+                          
+                          // 모달 닫기 버튼
+                          const closeButtons = document.querySelectorAll('.close-modal');
+                          closeButtons.forEach(button => {
+                            button.addEventListener('click', function() {
+                              bookDetailModal.classList.remove('active');
+                              bookclubDetailModal.classList.remove('active');
+                              document.body.style.overflow = 'auto';
+                            });
+                          });
+                          
+                          // 모달 외부 클릭 시 닫기
+                          bookDetailModal.addEventListener('click', function(e) {
+                            if (e.target === bookDetailModal) {
+                              bookDetailModal.classList.remove('active');
+                              document.body.style.overflow = 'auto';
+                            }
+                          });
+                          
+                          bookclubDetailModal.addEventListener('click', function(e) {
+                            if (e.target === bookclubDetailModal) {
+                              bookclubDetailModal.classList.remove('active');
+                              document.body.style.overflow = 'auto';
+                            }
+                          });
+                          
+                          // 내 서재 탭
+                          const tabs = document.querySelectorAll('.tab-active, .border-b-2');
+                          tabs.forEach(tab => {
+                            tab.addEventListener('click', function() {
+                              tabs.forEach(t => {
+                                t.classList.remove('tab-active');
+                                t.classList.remove('text-indigo-600');
+                                t.classList.remove('border-indigo-600');
+                                t.classList.add('text-gray-500');
+                                t.classList.add('border-transparent');
+                              });
+                              this.classList.add('tab-active');
+                              this.classList.add('text-indigo-600');
+                              this.classList.add('border-indigo-600');
+                              this.classList.remove('text-gray-500');
+                              this.classList.remove('border-transparent');
+                            });
+                          });
+                        });
+                      </script>
+                      </body>
+                      </html>
+                      </antArtifact>
+                    
