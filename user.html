@@ -6,6 +6,9 @@
   <title>밀리 엔터프라이즈 - 임직원용</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/literacy-test.css">
+  <script src="/js/literacy-test.js" defer></script>
+
   <style>
     /* 커스텀 스타일 */
     .book-cover {
@@ -945,7 +948,7 @@
       <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
         <div class="flex justify-between items-center mb-6">
           <h3 class="text-lg font-semibold">나의 역량 진단 결과</h3>
-          <button class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">역량 재진단</button>
+          <button id="start-literacy-assessment" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">역량 재진단</button>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
@@ -1060,7 +1063,7 @@
               <div class="bg-indigo-50 rounded-lg p-4">
                 <h5 class="text-sm font-medium text-indigo-800 mb-2">추천 도서</h5>
                 <div class="flex items-center mb-2">
-                  <img src="/api/placeholder/40/56" alt="디자인 시스템" class="h-7 rounded mr-2">
+                  <img src="https://contents.kyobobook.co.kr/sih/fit-in/400x0/pdt/9788994803265.jpg" alt="디자인 시스템" class="h-7 rounded mr-2">
                   <span class="text-sm">디자인 시스템 (앨마 샤틀)</span>
                 </div>
                 <div class="flex items-center">
@@ -1557,6 +1560,51 @@
                           });
                         });
                       </script>
+                      <!-- 문해력 평가 모달 -->
+<div id="literacy-test-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-auto">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl relative animate-fadeIn">
+        <!-- 닫기 버튼 -->
+        <button id="close-literacy-test" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
+          <i class="fas fa-times text-lg"></i>
+        </button>
+        
+        <!-- 상단 진행 상태 -->
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-bold text-gray-800">문해력 평가</h2>
+            <div class="text-sm text-gray-600">
+              문제 <span id="current-question">1</span>/<span id="total-questions">15</span>
+            </div>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
+            <div id="progress-bar" class="bg-indigo-600 h-2 rounded-full" style="width: 6.67%"></div>
+          </div>
+        </div>
+        
+        <!-- 문제 콘텐츠 -->
+        <div id="question-container" class="p-6 max-h-[70vh] overflow-y-auto">
+          <!-- 여기에 문제 콘텐츠가 동적으로 로드됨 -->
+        </div>
+        
+        <!-- 하단 네비게이션 -->
+        <div class="p-6 border-t border-gray-200 flex justify-between">
+          <button id="prev-question" class="text-gray-600 hover:text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors flex items-center" disabled>
+            <i class="fas fa-arrow-left mr-2"></i> 이전 문제
+          </button>
+          
+          <button id="next-question" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors flex items-center">
+            다음 문제 <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+        
+        <!-- 결과 화면 (초기에는 숨김) -->
+        <div id="result-container" class="p-6 hidden">
+          <!-- 여기에 결과가 동적으로 로드됨 -->
+        </div>
+      </div>
+    </div>
+  </div>
                       </body>
                       </html>
                       </antArtifact>
