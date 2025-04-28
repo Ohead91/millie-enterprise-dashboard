@@ -2,7 +2,7 @@
   {
     "id": 1,
     "text": "위 글을 토대로, 아래 문장에 적힌 내용의 옳고 그름을 바르게 짝지은 것은?",
-    "imageUrl": "/quiz/images/question1.jpg",
+    "imageUrl": "quiz/images/question1.jpg",
     "context": "[문장1] 스위스 생모리츠는 해발고도가 가장 높은 도시다.\n[문장2] 위스키의 풍미와 품질은 해발고도와 관련이 높다.",
     "options": ["O,O", "O,X", "X,O", "X,X"],
     "correctAnswer": 2

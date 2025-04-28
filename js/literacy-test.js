@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // 문제 데이터 로드
   async function loadQuestions() {
     try {
-      const response = await fetch("/quiz/literacy_questions.json");
+      const response = await fetch("quiz/literacy_questions.json");
       if (!response.ok) {
         throw new Error("문제 데이터를 불러올 수 없습니다.");
       }
